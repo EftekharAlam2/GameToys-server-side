@@ -34,11 +34,13 @@ async function run() {
 
     app.get("/toys", async (req, res) => {
       const page = parseInt(req.query.page) || 0;
-      const limit = parseInt(req.query.limit) || 20;
+      const limit = parseInt(req.query.limit) || 2;
       const skip = page * limit;
 
+      const searchQuery = req.query.searchQuery || "";
+
       const result = await toyCollection
-        .find()
+        .find({ toyName: { $regex: searchQuery, $options: "i" } })
         .skip(skip)
         .limit(limit)
         .toArray();
