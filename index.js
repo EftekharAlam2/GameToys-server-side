@@ -33,9 +33,21 @@ async function run() {
     });
 
     app.get("/toys", async (req, res) => {
-      const cursor = toyCollection.find();
-      const result = await cursor.toArray();
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 20;
+      const skip = page * limit;
+
+      const result = await toyCollection
+        .find()
+        .skip(skip)
+        .limit(limit)
+        .toArray();
       res.send(result);
+    });
+
+    app.get("/totalToys", async (req, res) => {
+      const result = await toyCollection.estimatedDocumentCount();
+      res.send({ totalToys: result });
     });
 
     // Send a ping to confirm a successful connection
