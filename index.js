@@ -60,6 +60,35 @@ async function run() {
       res.send({ totalToys: result });
     });
 
+    app.get("/toys/email/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+
+      const result = await toyCollection
+        .find(query)
+        .sort({ price: 1 })
+        .toArray();
+      res.send(result);
+    });
+
+    app.put("/toys/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedToy = req.body;
+
+      const coffee = {
+        $set: {
+          price: updatedToy.price,
+          quantity: updatedToy.quantity,
+          description: updatedToy.description,
+        },
+      };
+
+      const result = await toyCollection.updateOne(filter, coffee, options);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
